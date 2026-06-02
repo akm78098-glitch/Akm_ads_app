@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKM | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR - ADDED BACK -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">AKM Ads Market</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">📊 Dashboard</a>
+                <a href="marketplace.html" class="nav-item">🔍 Marketplace</a>
+                <a href="campaigns.html" class="nav-item">📈 Campaigns</a>
+                <a href="wallet.html" class="nav-item">💰 Wallet</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info" id="userInfo">Loading...</div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, <span id="userName">User</span></p>
+                </div>
+                <button class="btn-secondary" onclick="location.reload()">🔄 Refresh</button>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="kpi-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-label">Balance</div>
+                    <div class="stat-value" id="balanceVal">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Campaigns</div>
+                    <div class="stat-value" id="campaignsVal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Spent</div>
+                    <div class="stat-value" id="spentVal">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Orders</div>
+                    <div class="stat-value" id="pendingVal">0</div>
+                </div>
+            </div>
+
+            <!-- Activity Section -->
+            <div class="activity-section">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <button class="text-link" onclick="alert('Coming soon')">View All</button>
+                </div>
+                <div class="activity-list" id="activityList">
+                    <div class="activity-item">No recent activity</div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

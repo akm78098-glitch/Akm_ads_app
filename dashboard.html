@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AKM | Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, #1e1b4b, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 3-Dot Menu Button */
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .menu-dot {
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 199;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
+            z-index: 200;
+            transition: right 0.3s ease;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header .logo {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-nav {
+            padding: 20px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 12px;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 80px 20px 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .welcome-card h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .text-link {
+            background: none;
+            border: none;
+            color: #4f46e5;
+            cursor: pointer;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .activity-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (min-width: 768px) {
+            .mobile-header { display: none; }
+            .sidebar { left: 0; right: auto; }
+            .sidebar-overlay { display: none; }
+            .main-content { margin-left: 280px; max-width: none; padding: 40px; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header with 3-Dot Menu -->
+    <div class="mobile-header">
+        <div class="logo">AKM Ads Market</div>
+        <button class="menu-btn" id="menuToggle">
+            <span class="menu-dot"></span>
+            <span class="menu-dot"></span>
+            <span class="menu-dot"></span>
+        </button>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">AKM Ads Market</div>
+            <p>Premium Platform</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">📊 Dashboard</a>
+            <a href="marketplace.html" class="nav-item">🔍 Marketplace</a>
+            <a href="campaigns.html" class="nav-item">📈 Campaigns</a>
+            <a href="wallet.html" class="nav-item">💰 Wallet</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo">Loading...</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="welcome-card">
+            <h2>Welcome back, <span id="userName">User</span></h2>
+            <p>Manage your campaigns</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Balance</div><div class="stat-value" id="balanceVal">$0</div></div>
+            <div class="stat-card"><div class="stat-label">Active Campaigns</div><div class="stat-value" id="campaignsVal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Spent</div><div class="stat-value" id="spentVal">$0</div></div>
+            <div class="stat-card"><div class="stat-label">Pending Orders</div><div class="stat-value" id="pendingVal">0</div></div>
+        </div>
+
+        <div class="section-header">
+            <h3>Recent Activity</h3>
+            <button class="text-link" onclick="alert('Coming soon')">View All</button>
+        </div>
+        <div class="activity-list" id="activityList">
+            <div class="activity-item">No recent activity</div>
+        </div>
+    </main>
+
+    <script>
+        // ========== FIXED: MENU TOGGLE FUNCTION ==========
+        (function() {
+            // Get elements
+            const menuBtn = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            // Function to open menu
+            function openMenu() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                console.log('Menu opened'); // Debug log
+            }
+            
+            // Function to close menu
+            function closeMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                console.log('Menu closed'); // Debug log
+            }
+            
+            // Add click event to menu button
+            if (menuBtn) {
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (sidebar.classList.contains('active')) {
+                        closeMenu();
+                    } else {
+                        openMenu();
+                    }
+                });
+                console.log('Menu button found and event attached');
+            } else {
+                console.log('Menu button NOT found');
+            }
+            
+            // Close menu when clicking overlay
+            if (overlay) {
+                overlay.addEventListener('click', closeMenu);
+            }
+        })();
+
+        // ========== API CONFIGURATION ==========
+        const API_BASE = 'https://akm-ads-bot.onrender.com';
+        let currentUser = null;
+
+        // Load User
+        async function loadUser() {
+            const stored = localStorage.getItem('akm_user');
+            if (!stored) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            currentUser = JSON.parse(stored);
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) userInfo.innerHTML = `${currentUser.username || 'User'}<br><small>${currentUser.user_type || ''}</small>`;
+            const userName = document.getElementById('userName');
+            if (userName) userName.innerText = currentUser.username || 'User';
+            return currentUser;
+        }
+
+        // Load Dashboard
+        async function loadDashboard() {
+            await loadUser();
+            if (!currentUser) return;
+
+            try {
+                if (currentUser.user_type === 'advertiser') {
+                    const res = await fetch(`${API_BASE}/api/campaigns/advertiser/${currentUser.id}`);
+                    const campaigns = await res.json();
+                    document.getElementById('balanceVal').innerText = `$${(currentUser.balance || 0).toFixed(2)}`;
+                    document.getElementById('campaignsVal').innerText = (campaigns || []).filter(c => c.is_active).length;
+                    document.getElementById('spentVal').innerText = `$${(campaigns || []).reduce((s, c) => s + (c.budget || 0), 0).toFixed(2)}`;
+                    document.getElementById('activityList').innerHTML = '<div class="activity-item">Welcome to AKM Ads Market</div>';
+                } else {
+                    document.getElementById('balanceVal').innerText = `$${(currentUser.balance || 0).toFixed(2)}`;
+                    document.getElementById('campaignsVal').innerText = '0';
+                    document.getElementById('spentVal').innerText = '$0';
+                    document.getElementById('activityList').innerHTML = '<div class="activity-item">Add channels to start earning</div>';
+                }
+            } catch(e) {
+                document.getElementById('activityList').innerHTML = '<div class="activity-item">Backend connection error</div>';
+            }
+        }
+
+        // Initialize
+        loadDashboard();
+    </script>
+</body>
+</html>

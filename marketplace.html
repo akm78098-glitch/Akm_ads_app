@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AKM | Marketplace</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111827}
+        .mobile-header{position:fixed;top:0;left:0;right:0;height:60px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100}
+        .logo{font-size:18px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .menu-btn{background:rgba(255,255,255,0.1);border:none;width:44px;height:44px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+        .menu-dot{width:5px;height:5px;background:white;border-radius:50%}
+        .sidebar-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:199;opacity:0;visibility:hidden;transition:all 0.3s ease}
+        .sidebar-overlay.active{opacity:1;visibility:visible}
+        .sidebar{position:fixed;top:0;right:-280px;width:280px;height:100%;background:linear-gradient(180deg,#1e1b4b 0%,#0f172a 100%);z-index:200;transition:right 0.3s ease}
+        .sidebar.active{right:0}
+        .sidebar-header{padding:28px 24px;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .sidebar-header .logo{font-size:22px;margin-bottom:8px}
+        .sidebar-header p{font-size:12px;color:rgba(255,255,255,0.5)}
+        .sidebar-nav{padding:20px 16px}
+        .nav-item{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:15px;font-weight:500;border-radius:12px}
+        .nav-item.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
+        .sidebar-footer{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1)}
+        .user-info{font-size:12px;color:rgba(255,255,255,0.6)}
+        .main-content{padding:80px 20px 40px;max-width:600px;margin:0 auto}
+        .welcome-card{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:24px;padding:28px;margin-bottom:24px;color:white}
+        .welcome-card h2{font-size:22px;margin-bottom:8px}
+        .filter-section{margin-bottom:20px}
+        .filter-select{width:100%;padding:12px;border-radius:12px;border:1px solid #e5e7eb;background:white}
+        .channels-grid{display:flex;flex-direction:column;gap:16px}
+        .channel-card{background:white;border-radius:20px;padding:20px}
+        .channel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+        .channel-category{background:#e0e7ff;color:#4f46e5;padding:4px 12px;border-radius:20px;font-size:12px}
+        .channel-price{font-size:22px;font-weight:700;color:#4f46e5;margin:12px 0}
+        .btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;width:100%;margin-top:12px}
+        .loading{text-align:center;padding:40px;color:#9ca3af}
+        @media(min-width:768px){.mobile-header{display:none}.sidebar{left:0;right:auto}.sidebar-overlay{display:none}.main-content{margin-left:280px;max-width:none;padding:40px}}
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <div class="logo">AKM Ads Market</div>
+        <button class="menu-btn" id="menuToggle">
+            <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="logo">AKM Ads Market</div><p>Premium Platform</p></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="marketplace.html" class="nav-item active">🔍 Marketplace</a>
+            <a href="campaigns.html" class="nav-item">📈 Campaigns</a>
+            <a href="wallet.html" class="nav-item">💰 Wallet</a>
+        </nav>
+        <div class="sidebar-footer"><div class="user-info" id="userInfo">Loading...</div></div>
+    </aside>
+    <main class="main-content">
+        <div class="welcome-card"><h2>Channel Marketplace</h2><p>Discover premium channels for your campaigns</p></div>
+        <div class="filter-section"><select id="categoryFilter" class="filter-select" onchange="filterChannels()"><option value="">All Categories</option><option value="Tech">Technology</option><option value="News">News</option><option value="Gaming">Gaming</option><option value="Business">Business</option><option value="Crypto">Crypto</option></select></div>
+        <div class="channels-grid" id="channelsGrid"><div class="loading">Loading channels...</div></div>
+    </main>
+    <script>
+        // Menu Toggle
+        (function() {
+            const menuBtn = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            function openMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeMenu() { sidebar.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+            if (menuBtn) { menuBtn.addEventListener('click', function(e) { e.stopPropagation(); if (sidebar.classList.contains('active')) { closeMenu(); } else { openMenu(); } }); }
+            if (overlay) { overlay.addEventListener('click', closeMenu); }
+        })();
+
+        const API_BASE = 'https://akm-ads-bot.onrender.com';
+        let currentUser = null, allChannels = [];
+
+        async function loadUser() {
+            const stored = localStorage.getItem('akm_user');
+            if (!stored) { window.location.href = 'index.html'; return null; }
+            currentUser = JSON.parse(stored);
+            document.getElementById('userInfo').innerHTML = `${currentUser.username || 'User'}<br><small>${currentUser.user_type || ''}</small>`;
+            return currentUser;
+        }
+
+        async function loadMarketplace() {
+            await loadUser();
+            try {
+                const res = await fetch(`${API_BASE}/api/channels`);
+                allChannels = await res.json();
+                displayChannels(allChannels);
+            } catch(e) { document.getElementById('channelsGrid').innerHTML = '<div class="loading">Error loading channels</div>'; }
+        }
+
+        function displayChannels(channels) {
+            const grid = document.getElementById('channelsGrid');
+            if (!channels || channels.length === 0) { grid.innerHTML = '<div class="loading">No channels available</div>'; return; }
+            grid.innerHTML = channels.map(c => `<div class="channel-card"><div class="channel-header"><strong>${c.title}</strong><span class="channel-category">${c.category}</span></div><div>Subscribers: ${(c.subscribers || 0).toLocaleString()}</div><div class="channel-price">$${(c.price_per_post || 0).toFixed(2)} per post</div>${currentUser?.user_type === 'advertiser' ? `<button class="btn-primary" onclick="bookChannel(${c.id}, ${c.price_per_post})">Book Advertisement</button>` : ''}</div>`).join('');
+        }
+
+        function filterChannels() {
+            const category = document.getElementById('categoryFilter').value;
+            if (!category) displayChannels(allChannels);
+            else displayChannels(allChannels.filter(c => c.category === category));
+        }
+
+        async function bookChannel(id, price) {
+            if (!currentUser) return;
+            if (confirm(`Book this channel for $${price}?`)) {
+                try {
+                    await fetch(`${API_BASE}/api/campaigns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ advertiser_id: currentUser.id, title: 'Direct Booking', description: 'Auto-created', category: 'General', budget: price, price_per_post: price, target_subscribers_min: 0 }) });
+                    alert('Campaign created!'); window.location.href = 'campaigns.html';
+                } catch(e) { alert('Error: ' + e.message); }
+            }
+        }
+
+        loadMarketplace();
+    </script>
+</body>
+</html>
